@@ -8,7 +8,6 @@ dt = 0.01
 print(points)
 
 def copy_points(dst, src):
-    print("dl: " + str(len(dst)) + " sl: " + str(len(src)))
     if(len(dst) != len(src)):
         raise Exception("trying to copy arrays of different length")
     for i in range(len(src)):
@@ -24,11 +23,10 @@ def bezier_point(p, t, buf):
             buf[y] = a + b
     return buf[0]
 
-def bezier(p, dt):
-    buf = [None] * len(p)
-    print("here")
+def bezier(points, dt):
+    buf = [None] * len(points)
     for i in np.arange(dt, 1 + dt, dt):
-        p = bezier_point(p, i, buf)
+        p = bezier_point(points, i, buf)
         yield p
 
 WIDTH, HEIGHT = 256, 256
@@ -41,8 +39,6 @@ ctx.scale(WIDTH, HEIGHT)  # Normalizing the canvas
 ctx.move_to(points[0][0], points[0][1])
 
 for p in bezier(points, dt):
-    print("points: " + str(points))
-    print("p: " + str(p[0]) + " " + str(p[1]))
     ctx.line_to(p[0], p[1])
 
 
