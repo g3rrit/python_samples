@@ -1,12 +1,11 @@
 import socket
 import sys
 
-URL = b"send.htwk-leipzig.de"
+URL = "smtp.mail.com"
 PORT = 25
-SRC = "christoph.siegert@stud.htwk-leipzig.de"
-DST = "christoph.siegert@stud.htwk-leipzig.de"
-SUB = "test"
-DATA = "hi"
+SRC = "sender@mail.com"
+DST = "recipient@mail.com"
+DATA = "Subject: ...\r\nHello"
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -17,14 +16,17 @@ sock.connect(server_address)
 
 def rall():
     r = ' '
-    while r != '\n':
-        r = sock.recv(1)
-        print(r)
+    try:
+        while r != b"\n":
+            r = sock.recv(1)
+            print(r.decode(), end = "")
+    except Exception as e:
+        print("unable to recv on host: " + str(e))
 
 try:
     rall()
 
-    # EHLO test.example.com
+    # HELO test.example.com
     # MAIL FROM: Absenderadresse
     # RCPT TO: Empfaengeradresse
     # DATA
@@ -34,12 +36,16 @@ try:
     # newline
     # .
     # QUIT
-    msgs = [b"HELO " + URL, "MAIL FROM: " + SRC, "RCTP TO: " + DST, "DATA", "Subject: " + SUB, "\r\n", DATA, "\r\n", ".", "QUIT"]
+    msgs = ["HELO " + URL, "MAIL FROM: " + SRC, "RCPT TO: " + DST, "DATA", DATA + "\r\n.", "QUIT"]
 
     for msg in msgs:
-        print("sending: " + msg + b"\r\n")
-        sock.sendall(msg)
+        msg = msg + "\r\n"
+        print("\n########################################")
+        print("sending: " + msg)
+        sock.sendall(str.encode(msg))
+        print("receiving: ", end = "")
         rall()
+        print("-----------------------------------------")
 finally:
     print('closing socket')
     sock.close()
